@@ -135,7 +135,7 @@
   <parent link="base_link"/>
   <child link="head_1"/>
   <axis xyz="1.0 0.0 -0.0"/>
-  <limit upper="-2.356194" lower="-3.926991" effort="100" velocity="100"/>
+  <limit upper="0.785399" lower="-0.785399" effort="100" velocity="100"/>
 </joint>
 
 <joint name="right_wheel_to_base_link" type="continuous">
