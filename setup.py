@@ -17,7 +17,7 @@ setup(
         (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
         (os.path.join('share', package_name, 'config'), glob('config/*'))
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'rtabmap_ros'],
     zip_safe=True,
     maintainer='author',
     maintainer_email='todo@todo.com',
