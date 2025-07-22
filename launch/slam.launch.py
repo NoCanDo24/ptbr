@@ -15,7 +15,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-    parameters=[{'frame_id':'oak-d-base-frame',
+    parameters=[{
+         'frame_id':'oak-d-base-frame',
          'subscribe_rgbd':True,
          'subscribe_odom_info':True,
          'approx_sync':False,
@@ -49,11 +50,11 @@ def generate_launch_description():
          'map_manager/grid/cloud_voxel_size': '0.05', # Voxel filter size for points before grid creation
          'map_manager/grid/map_filter_nodes': 'true', # Filter out nodes not in active graph
          'map_manager/grid/min_map_size': '1.0', # Minimum size of the map to publish
-         'map_manager/grid/map_updated': 'true' # Publish map updates
+         'map_manager/grid/map_updated': 'true', # Publish map updates
          'Rtabmap/SavePointCloud': 'true',
-	 'Rtabmap/SaveImgRaw': 'false',
-	 'Rtabmap/SaveDepthRaw': 'false',        
-	}]
+	     'Rtabmap/SaveImgRaw': 'false',
+	     'Rtabmap/SaveDepthRaw': 'false'
+	    }]
 
     remappings=[('imu', '/imu/data')]
 
