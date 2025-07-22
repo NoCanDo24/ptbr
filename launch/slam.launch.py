@@ -23,13 +23,16 @@ def generate_launch_description():
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
          'Odom/ResetCountdown': '0',
-         'Odom/Strategy': '9',
+         'Odom/Strategy': '0',
+	 'Odom/ImageDecimation': '2',
          'Optimizer/GravitySigma': '0.3',
          'Vis/ForceIMUInitialization': 'true',
 
 
          'Vis/FeatureType': '6',
-         'Vis/MaxFeatures': '1000',
+         'Vis/MaxFeatures': '1500',
+	 'Vis/MinInliers': '12',
+	 'Vis/Pipeline': '6',
          'Mem/ReduceGraph': 'true',
          
          'Rtabmap/KeyFrameThr': '0.4',
@@ -68,6 +71,7 @@ def generate_launch_description():
                 launch_arguments={'depth_aligned': 'false',
                                   'enableRviz': 'false',
                                   'monoResolution': '400p',
+				  'rgbResolution': '400p',
                                   'enable_imu': 'true', # Added: explicitly disable IMU in the camera driver
                                   'camera_model': 'OAK-D-LITE',
                                   'stereo_fps': '10'
