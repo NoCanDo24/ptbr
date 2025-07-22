@@ -19,12 +19,14 @@ def generate_launch_description():
          'subscribe_rgbd':True,
          'subscribe_odom_info':True,
          'approx_sync':False,
-         'wait_imu_to_init':False,
+         'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
          'Odom/ResetCountdown': '0',
-         'Odom/Strategy': '0',
-        #  'Optimizer/GravitySigma': '0.3',
-         'Vis/ForceIMUInitialization': 'false',
+         'Odom/Strategy': '9',
+         'Optimizer/GravitySigma': '0.3',
+         'Vis/ForceIMUInitialization': 'true',
+
+
          'Vis/FeatureType': '6',
          'Vis/MaxFeatures': '1000',
          'Mem/ReduceGraph': 'true',
@@ -48,9 +50,12 @@ def generate_launch_description():
          'map_manager/grid/map_filter_nodes': 'true', # Filter out nodes not in active graph
          'map_manager/grid/min_map_size': '1.0', # Minimum size of the map to publish
          'map_manager/grid/map_updated': 'true' # Publish map updates
-                 }]
+         'Rtabmap/SavePointCloud': 'true',
+	 'Rtabmap/SaveImgRaw': 'false',
+	 'Rtabmap/SaveDepthRaw': 'false',        
+	}]
 
-    # Removed: remappings=[('imu', '/imu/data')]
+    remappings=[('imu', '/imu/data')]
 
     return LaunchDescription([
 
@@ -62,10 +67,17 @@ def generate_launch_description():
                 launch_arguments={'depth_aligned': 'false',
                                   'enableRviz': 'false',
                                   'monoResolution': '400p',
-                                  'enable_imu': 'false', # Added: explicitly disable IMU in the camera driver
+                                  'enable_imu': 'true', # Added: explicitly disable IMU in the camera driver
                                   'camera_model': 'OAK-D-LITE',
                                   'stereo_fps': '10'
                                   }.items(),
+        ),
+
+	Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='oak_imu_tf_publisher',
+            arguments=['0', '0', '0.0', '0', '0', '0', '1', 'oak-d-base-frame', 'oak_imu_frame'] # Example: 5cm z offset
         ),
 
         # Sync right/depth/camera_info together
@@ -76,7 +88,7 @@ def generate_launch_description():
                         ('rgb/camera_info', '/right/camera_info'),
                         ('depth/image', '/stereo/depth')]),
 
-        Node( # Removed imu_filter_madgwick as it's not needed without IMU
+       Node( # Removed imu_filter_madgwick as it's not needed without IMU
             package='imu_filter_madgwick', executable='imu_filter_madgwick_node', output='screen',
             parameters=[{'use_mag': False, 
                          'world_frame':'enu', 
@@ -87,14 +99,14 @@ def generate_launch_description():
         Node(
             package='rtabmap_odom', executable='rgbd_odometry', output='screen',
             parameters=parameters,
-            # Removed: remappings=remappings # No IMU remapping here
+            remappings=remappings # No IMU remapping here
             ),
 
         # VSLAM
         Node(
             package='rtabmap_slam', executable='rtabmap', output='screen',
             parameters=parameters,
-            # Removed: remappings=remappings, # No IMU remapping here
+            remappings=remappings, # No IMU remapping here
             arguments=['-d']),
 
         # Visualization
