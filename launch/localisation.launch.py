@@ -84,7 +84,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='oak_imu_tf_publisher',
-            arguments=['0', '0', '0.0', '0', '0', '0', '1', 'oak-d-base-frame', 'oak_imu_frame'] # Example: 5cm z offset
+            arguments=['0', '0', '0.0', '0.7071', '0', '0', '0.7071', 'oak-d-base-frame', 'oak_imu_frame'] # Example: 5cm z offset
         ),
 
         # Sync right/depth/camera_info together
