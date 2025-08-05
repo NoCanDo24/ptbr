@@ -48,9 +48,9 @@
   </collision>
 </link>
 
-<joint name="head_to_base" type="revolute">
+<joint name="head_link" type="revolute">
   <origin xyz="0 -0.0327525 0.085" rpy="0 0 0"/>
-  <parent link="base"/>
+  <parent link="base_link"/>
   <child link="head"/>
   <axis xyz="1.0 0.0 0.0"/>
   <limit upper="0.785399" lower="-0.785399" effort="100" velocity="100"/>
@@ -96,9 +96,28 @@
       <box size="0.1 0.1 0.1"/>
     </geometry>
   </collision>
+
+  <collision>
+    <origin xyz="0 0.041 0.138" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.106 0.018 0.106"/>
+    </geometry>
+  </collision>
+  <collision>
+    <origin xyz="0 0 0.024" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.038895 0.038895 0.048"/>
+    </geometry>
+  </collision>
+  <collision>
+    <origin xyz="0.0 0.0 0.068" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.0525 0.0525 0.04"/>
+    </geometry>
+  </collision>
 </link>
 
-<joint name="camera_to_head" type="fixed">
+<joint name="camera_joint" type="fixed">
   <origin xyz="0.0 0.051235 0.174" rpy="0.0 0.0 0.0"/>
   <parent link="head"/>
   <child link="camera_link"/>
@@ -178,61 +197,61 @@
   </collision>
 </link>
 
-<link name="left_arm_1">
+
+<joint name="left_arm_joint" type="continuous">
+  <origin xyz="-0.05 0.0 0.146862" rpy="0 -${pi/2} 0"/>
+  <parent link="head"/>
+  <child link="left_arm"/>
+  <axis xyz="0 0.0 -1"/>
+</joint>
+
+<link name="left_arm">
   <inertial>
     <origin xyz="0.018087977944126324 -0.005800896128886866 -0.056698307724850905" rpy="0 0 0"/>
     <mass value="1.013009141787747"/>
     <inertia ixx="0.002313" iyy="0.002182" izz="0.000268" ixy="8e-06" iyz="-0.00039" ixz="6.4e-05"/>
   </inertial>
   <visual>
-    <origin xyz="-0.049692 -0.041636 -0.266278" rpy="0 0 0"/>
+    <origin xyz="-0.266278 0.041636 -0.049692" rpy="${pi} -${pi/2} 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/left_arm_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://ptbr/meshes/left_arm_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.049692 -0.041636 -0.266278" rpy="0 0 0"/>
+    <origin xyz="-0.266278 0.041636 -0.049692" rpy="${pi} -${pi/2} 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/left_arm_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://ptbr/meshes/left_arm_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
 
-<link name="right_arm_1">
+<joint name="right_arm_joint" type="continuous">
+  <origin xyz="0.05 0.0 0.146862" rpy="0 ${pi/2} 0"/>
+  <parent link="head"/>
+  <child link="right_arm"/>
+  <axis xyz="0 0.0 1"/>
+</joint>
+
+<link name="right_arm">
   <inertial>
     <origin xyz="-0.018087407770600646 -0.005810132869209922 -0.056697751450645734" rpy="0 0 0"/>
     <mass value="1.0130091381540007"/>
     <inertia ixx="0.002313" iyy="0.002182" izz="0.000268" ixy="-8e-06" iyz="-0.00039" ixz="-6.4e-05"/>
   </inertial>
   <visual>
-    <origin xyz="0.050308 -0.041636 -0.266278" rpy="0 0 0"/>
+    <origin xyz="0.266278 0.041636 -0.050308" rpy="${pi} ${pi/2} 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/right_arm_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://ptbr/meshes/right_arm_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="0.050308 -0.041636 -0.266278" rpy="0 0 0"/>
+    <origin xyz="0.266278 0.041636 -0.050308" rpy="${pi} ${pi/2} 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/right_arm_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://ptbr/meshes/right_arm_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
-
-
-<joint name="left_arm_to_base_link" type="continuous">
-  <origin xyz="0.05 0.0 0.146862" rpy="0 0 0"/>
-  <parent link="head"/>
-  <child link="left_arm_1"/>
-  <axis xyz="1.0 0.0 -0.0"/>
-</joint>
-
-<joint name="right_arm_to_base_link" type="continuous">
-  <origin xyz="-0.05 0.0 0.146862" rpy="0 0 0"/>
-  <parent link="head"/>
-  <child link="right_arm_1"/>
-  <axis xyz="-1.0 -0.0 0.0"/>
-</joint>
 
 </robot>
