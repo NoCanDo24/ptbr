@@ -10,40 +10,56 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
+    mode = LaunchConfiguration('slame_mode', default='mapping')
+    declare_mode = DeclareLaunchArgument('slam_mode', default_value=mode)
+
+    startNewMap = None
+    rtabmap_arg = None
+    if mode == 'localisation':
+        startNewMap = False
+        rtabmap_arg = ''
+    else:
+        startNewMap = True
+        rtabmap_arg = '--delete_db_on_start'
+
     parameters=[{
          'frame_id':'oak-d-base-frame',
          'subscribe_rgbd':True,
+        #  'subscribe_rgb': True,
+        #  'subscribe_depth': True,
          'subscribe_odom_info':True,
-         'approx_sync':False,
+         'approx_sync':True,
+         'approx_sync_max_interval': 0.1,
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
          'Odom/ResetCountdown': '0',
          'Odom/Strategy': '0',
-	 'Odom/ImageDecimation': '2',
+	     'Odom/ImageDecimation': '2',
          'Optimizer/GravitySigma': '0.3',
          'Vis/ForceIMUInitialization': 'true',
 
 
          'Vis/FeatureType': '6',
          'Vis/MaxFeatures': '1500',
-	 'Vis/MinInliers': '12',
-	 'Vis/Pipeline': '6',
+	     'Vis/MinInliers': '12',
+	     'Vis/Pipeline': '6',
          'Mem/ReduceGraph': 'true',
          
          'Rtabmap/KeyFrameThr': '0.4',
          
-         'QueueSize': '10',
+         'QueueSize': 10,
          'Rtabmap/PublishTF': 'true',
 
          'database_path': '~/.ros/rtabmap.db',
-         # 'rtabmap_args': '--delete_db_on_start',
-         'Rtabmap/StartNewMap': 'false',
-         'Ratmap/Mem/Incremental': 'false',
+         'rtabmap_args': rtabmap_arg,
+         'Rtabmap/StartNewMap': startNewMap,
+         'Rtabmap/Mem/Incremental': startNewMap,
 
          # NEW: Grid Map Generation Parameters for Nav2
          'publish_map_tf': 'true', # Ensures map->odom transform is published
@@ -63,20 +79,31 @@ def generate_launch_description():
 
     remappings=[('imu', '/imu/data')]
 
+
     return LaunchDescription([
+        declare_mode,
+        
 
         # Launch camera driver
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('depthai_examples'), 'launch'),
                 '/stereo_inertial_node.launch.py']),
-                launch_arguments={'depth_aligned': 'false',
+                launch_arguments={'usb2Mode': 'true',
+                                  'depth_aligned': 'true',
                                   'enableRviz': 'false',
-                                  'monoResolution': '400p',
-				  'rgbResolution': '400p',
+                                  'monoResolution': '480p',
+				                  'rgbResolution': '4K',
+                                  'rgbScaleNumerator': '1',
+                                  'rgbScaleDinominator': '5',
                                   'enable_imu': 'true', # Added: explicitly disable IMU in the camera driver
                                   'camera_model': 'OAK-D-LITE',
-                                  'stereo_fps': '10'
+                                  'stereo_fps': '10',
+                                  'nnName': 'butter_person_v1_openvino_2022.1_3shave.blob',
+                                  'resourceBaseFolder': '/home/leosc/MaturaProject/PassTheButterRobot/result',
+                                  'detectionClassesCount': '2',
+                                #   'previewHeight': '640',
+                                #   'previewWidth': '640'
                                   }.items(),
         ),
 
@@ -91,9 +118,9 @@ def generate_launch_description():
         Node(   
             package='rtabmap_sync', executable='rgbd_sync', output='screen',
             parameters=parameters,
-            remappings=[('rgb/image', '/right/image_rect'),
-                        ('rgb/camera_info', '/right/camera_info'),
-                        ('depth/image', '/stereo/depth')]),
+            remappings=[('rgb/image', '/color/image'),
+                        ('rgb/camera_info', '/color/camera_info'),
+                        ('depth/image', 'stereo/converted_depth')]),
 
        Node( # Removed imu_filter_madgwick as it's not needed without IMU
             package='imu_filter_madgwick', executable='imu_filter_madgwick_node', output='screen',

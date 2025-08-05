@@ -5,85 +5,175 @@
 <xacro:include filename="$(find ptbr)/urdf/ptbr.ros2control" />
 <xacro:include filename="$(find ptbr)/urdf/ptbr.gazebo" />
 <link name="base_link">
+</link>
+
+<joint name="base_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="base"/>
+</joint>
+
+<link name="base">
   <inertial>
     <origin xyz="-0.00030771491577107806 0.006425674318858227 0.038113735190444614" rpy="0 0 0"/>
     <mass value="6.4013846052337655"/>
     <inertia ixx="0.018437" iyy="0.007171" izz="0.017545" ixy="0.0" iyz="-0.001397" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0.006" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <box size="0.08 0.1634 0.06"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <visual>
+    <origin xyz="0.0 -0.0327525 0.0575" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.032895 0.032895 0.055"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0.006" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <box size="0.08 0.1634 0.06"/>
     </geometry>
+    <material name="silver"/>
+  </collision>
+  <collision>
+    <origin xyz="0.0 -0.0327525 0.0575" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.032895 0.032895 0.055"/>
+    </geometry>
+    <material name="silver"/>
   </collision>
 </link>
 
-<link name="head_1">
+<joint name="head_to_base" type="revolute">
+  <origin xyz="0 -0.0327525 0.085" rpy="0 0 0"/>
+  <parent link="base"/>
+  <child link="head"/>
+  <axis xyz="1.0 0.0 0.0"/>
+  <limit upper="0.785399" lower="-0.785399" effort="100" velocity="100"/>
+</joint>
+
+<link name="head">
   <inertial>
     <origin xyz="2.850842288221471e-07 -0.001985837786485485 0.12158816571318953" rpy="0 0 0"/>
     <mass value="9.976187828305356"/>
     <inertia ixx="0.029478" iyy="0.029097" izz="0.015168" ixy="0.0" iyz="0.000325" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.000308 -0.041636 -0.119416" rpy="0 0 0"/>
+    <origin xyz="0 0 0.138" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/head_1.stl" scale="0.001 0.001 0.001"/>
+      <box size="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
-  <collision>
-    <origin xyz="0.000308 -0.041636 -0.119416" rpy="0 0 0"/>
+
+  <visual>
+    <origin xyz="0 0.041 0.138" rpy="0.0 0.0 0.0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/head_1.stl" scale="0.001 0.001 0.001"/>
+      <box size="0.106 0.018 0.106"/>
+    </geometry>
+  </visual>
+  <visual>
+    <origin xyz="0 0 0.024" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.038895 0.038895 0.048"/>
+    </geometry>
+    <material name="silver"/>
+
+  </visual>
+  <visual>
+    <origin xyz="0.0 0.0 0.068" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.0525 0.0525 0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0.138" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
 
-<link name="right_wheel_1">
+<joint name="camera_to_head" type="fixed">
+  <origin xyz="0.0 0.051235 0.174" rpy="0.0 0.0 0.0"/>
+  <parent link="head"/>
+  <child link="camera_link"/>
+  <axis xyz="0.0 0.0 0.0"/>
+</joint>
+
+<link name="camera_link">
+  <visual>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.09093 0.00247 0.027965"/>
+    </geometry>
+    <material name="red"/>
+  </visual>
+  <collision>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <geometry>
+      <box size="0.09093 0.00247 0.027965"/>
+    </geometry>
+  </collision>
+</link>
+
+
+<joint name="right_wheel_joint" type="continuous">
+  <origin xyz="0.06 0 0" rpy="0 ${pi/2} 0"/>
+  <parent link="base_link"/>
+  <child link="right_wheel"/>
+  <axis xyz="0 0.0 -1"/>
+</joint>
+
+<link name="right_wheel">
   <inertial>
     <origin xyz="-0.019999714915771002 -2.0220914574015092e-07 2.2264549151551627e-07" rpy="0 0 0"/>
     <mass value="1.1403478677706373"/>
     <inertia ixx="0.000659" iyy="0.000482" izz="0.000482" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.040308 -0.002654 -0.028416" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0325" length="0.04"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="0.040308 -0.002654 -0.028416" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0325" length="0.04"/>
     </geometry>
   </collision>
 </link>
 
-<link name="left_wheel_1">
+<joint name="left_wheel_joint" type="continuous">
+  <origin xyz="-0.06 0 0" rpy="0 -${pi/2} 0"/>
+  <parent link="base_link"/>
+  <child link="left_wheel"/>
+  <axis xyz="0 0.0 1"/>
+</joint>
+
+<link name="left_wheel">
   <inertial>
-    <origin xyz="0.020000285084228846 -2.0220914535677703e-07 2.2264549146347457e-07" rpy="0 0 0"/>
-    <mass value="1.1403478677706371"/>
+    <origin xyz="-0.019999714915771002 -2.0220914574015092e-07 2.2264549151551627e-07" rpy="0 0 0"/>
+    <mass value="1.1403478677706373"/>
     <inertia ixx="0.000659" iyy="0.000482" izz="0.000482" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="-0.039692 -0.002654 -0.028416" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0325" length="0.04"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="-0.039692 -0.002654 -0.028416" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find ptbr)/meshes/left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <cylinder radius="0.0325" length="0.04"/>
     </geometry>
   </collision>
 </link>
@@ -130,38 +220,17 @@
   </collision>
 </link>
 
-<joint name="head_to_base_link" type="revolute">
-  <origin xyz="-0.000308 0.041636 0.119416" rpy="0 0 0"/>
-  <parent link="base_link"/>
-  <child link="head_1"/>
-  <axis xyz="1.0 0.0 -0.0"/>
-  <limit upper="0.785399" lower="-0.785399" effort="100" velocity="100"/>
-</joint>
-
-<joint name="right_wheel_to_base_link" type="continuous">
-  <origin xyz="-0.040308 0.002654 0.028416" rpy="0 0 0"/>
-  <parent link="base_link"/>
-  <child link="right_wheel_1"/>
-  <axis xyz="-1.0 -0.0 0.0"/>
-</joint>
-
-<joint name="left_wheel_to_base_link" type="continuous">
-  <origin xyz="0.039692 0.002654 0.028416" rpy="0 0 0"/>
-  <parent link="base_link"/>
-  <child link="left_wheel_1"/>
-  <axis xyz="1.0 0.0 -0.0"/>
-</joint>
 
 <joint name="left_arm_to_base_link" type="continuous">
   <origin xyz="0.05 0.0 0.146862" rpy="0 0 0"/>
-  <parent link="head_1"/>
+  <parent link="head"/>
   <child link="left_arm_1"/>
   <axis xyz="1.0 0.0 -0.0"/>
 </joint>
 
 <joint name="right_arm_to_base_link" type="continuous">
   <origin xyz="-0.05 0.0 0.146862" rpy="0 0 0"/>
-  <parent link="head_1"/>
+  <parent link="head"/>
   <child link="right_arm_1"/>
   <axis xyz="-1.0 -0.0 0.0"/>
 </joint>

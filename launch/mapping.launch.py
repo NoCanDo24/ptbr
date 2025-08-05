@@ -18,8 +18,11 @@ def generate_launch_description():
     parameters=[{
          'frame_id':'oak-d-base-frame',
          'subscribe_rgbd':True,
+        #  'subscribe_rgb': True,
+        #  'subscribe_depth': True,
          'subscribe_odom_info':True,
-         'approx_sync':False,
+         'approx_sync':True,
+         'approx_sync_max_interval': 0.1,
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
          'Odom/ResetCountdown': '0',
@@ -37,7 +40,7 @@ def generate_launch_description():
          
          'Rtabmap/KeyFrameThr': '0.4',
          
-         'QueueSize': '10',
+         'QueueSize': 10,
          'Rtabmap/PublishTF': 'true',
 
          'database_path': '~/.ros/rtabmap.db',
@@ -68,13 +71,20 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('depthai_examples'), 'launch'),
                 '/stereo_inertial_node.launch.py']),
-                launch_arguments={'depth_aligned': 'false',
+                launch_arguments={'depth_aligned': 'true',
                                   'enableRviz': 'false',
-                                  'monoResolution': '400p',
-				  'rgbResolution': '400p',
+                                  'monoResolution': '480p',
+				                  'rgbResolution': '4K',
+                                  'rgbScaleNumerator': '1',
+                                  'rgbScaleDinominator': '5',
                                   'enable_imu': 'true', # Added: explicitly disable IMU in the camera driver
                                   'camera_model': 'OAK-D-LITE',
-                                  'stereo_fps': '10'
+                                  'stereo_fps': '10',
+                                  'nnName': 'butter_person_v1_openvino_2022.1_3shave.blob',
+                                  'resourceBaseFolder': '/home/leosc/MaturaProject/PassTheButterRobot/result',
+                                  'detectionClassesCount': '2',
+                                #   'previewHeight': '640',
+                                #   'previewWidth': '640'
                                   }.items(),
         ),
 
@@ -89,9 +99,9 @@ def generate_launch_description():
         Node(   
             package='rtabmap_sync', executable='rgbd_sync', output='screen',
             parameters=parameters,
-            remappings=[('rgb/image', '/right/image_rect'),
-                        ('rgb/camera_info', '/right/camera_info'),
-                        ('depth/image', '/stereo/depth')]),
+            remappings=[('rgb/image', '/color/image'),
+                        ('rgb/camera_info', '/color/camera_info'),
+                        ('depth/image', 'stereo/converted_depth')]),
 
        Node( # Removed imu_filter_madgwick as it's not needed without IMU
             package='imu_filter_madgwick', executable='imu_filter_madgwick_node', output='screen',
