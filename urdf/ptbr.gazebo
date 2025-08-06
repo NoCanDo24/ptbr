@@ -11,6 +11,13 @@
   <gravity>true</gravity>
 </gazebo>
 
+<gazebo reference="base">
+  <material>${body_color}</material>
+  <mu1>0.00002</mu1>
+  <mu2>0.00002</mu2>
+  <gravity>true</gravity>
+</gazebo>
+
 <gazebo reference="head">
   <material>${body_color}</material>
   <mu1>0.2</mu1>
@@ -45,7 +52,7 @@
   <mu2>0.2</mu2>
   <self_collide>true</self_collide>
 </gazebo>
-<!-- 
+
 <gazebo>
   <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
     <right_joint>right_wheel_joint</right_joint>
@@ -73,5 +80,6 @@
     <topic>joint_states</topic>
     <joint_name>left_wheel_joint</joint_name>
     <joint_name>right_wheel_joint</joint_name>
-  </plugin> -->
+  </plugin>
+</gazebo>
 </robot>

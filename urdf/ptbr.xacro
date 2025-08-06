@@ -18,7 +18,7 @@
 <link name="base">
   <inertial>
     <origin xyz="-0.00030771491577107806 0.006425674318858227 0.038113735190444614" rpy="0 0 0"/>
-    <mass value="6.4013846052337655"/>
+    <mass value="10"/>
     <inertia ixx="0.018437" iyy="0.007171" izz="0.017545" ixy="0.0" iyz="-0.001397" ixz="-0.0"/>
   </inertial>
   <visual>
@@ -62,7 +62,7 @@
 <link name="head">
   <inertial>
     <origin xyz="2.850842288221471e-07 -0.001985837786485485 0.12158816571318953" rpy="0 0 0"/>
-    <mass value="9.976187828305356"/>
+    <mass value="2"/>
     <inertia ixx="0.029478" iyy="0.029097" izz="0.015168" ixy="0.0" iyz="0.000325" ixz="-0.0"/>
   </inertial>
   <visual>
@@ -135,7 +135,7 @@
 <link name="right_wheel">
   <inertial>
     <origin xyz="-0.019999714915771002 -2.0220914574015092e-07 2.2264549151551627e-07" rpy="0 0 0"/>
-    <mass value="1.1403478677706373"/>
+    <mass value="1"/>
     <inertia ixx="0.000659" iyy="0.000482" izz="0.000482" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
@@ -165,7 +165,7 @@
 <link name="left_wheel">
   <inertial>
     <origin xyz="-0.019999714915771002 -2.0220914574015092e-07 2.2264549151551627e-07" rpy="0 0 0"/>
-    <mass value="1.1403478677706373"/>
+    <mass value="1"/>
     <inertia ixx="0.000659" iyy="0.000482" izz="0.000482" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
@@ -194,7 +194,7 @@
 <link name="left_arm">
   <inertial>
     <origin xyz="0.018087977944126324 -0.005800896128886866 -0.056698307724850905" rpy="0 0 0"/>
-    <mass value="1.013009141787747"/>
+    <mass value="0.1"/>
     <inertia ixx="0.002313" iyy="0.002182" izz="0.000268" ixy="8e-06" iyz="-0.00039" ixz="6.4e-05"/>
   </inertial>
   <visual>
@@ -222,7 +222,7 @@
 <link name="right_arm">
   <inertial>
     <origin xyz="-0.018087407770600646 -0.005810132869209922 -0.056697751450645734" rpy="0 0 0"/>
-    <mass value="1.0130091381540007"/>
+    <mass value="0.1"/>
     <inertia ixx="0.002313" iyy="0.002182" izz="0.000268" ixy="-8e-06" iyz="-0.00039" ixz="-6.4e-05"/>
   </inertial>
   <visual>
