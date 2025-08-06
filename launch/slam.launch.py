@@ -14,6 +14,7 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
+import xacro
 
 def generate_launch_description():
     mode = LaunchConfiguration('slame_mode', default='mapping')
@@ -29,7 +30,7 @@ def generate_launch_description():
         rtabmap_arg = '--delete_db_on_start'
 
     parameters=[{
-         'frame_id':'oak-d-base-frame',
+         'frame_id':'base_link',
          'subscribe_rgbd':True,
         #  'subscribe_rgb': True,
         #  'subscribe_depth': True,
@@ -79,10 +80,10 @@ def generate_launch_description():
 
     remappings=[('imu', '/imu/data')]
 
-
     return LaunchDescription([
         declare_mode,
         
+
 
         # Launch camera driver
         IncludeLaunchDescription(
@@ -102,18 +103,18 @@ def generate_launch_description():
                                   'nnName': 'butter_person_v1_openvino_2022.1_3shave.blob',
                                   'resourceBaseFolder': '/home/leosc/MaturaProject/PassTheButterRobot/result',
                                   'detectionClassesCount': '2',
+                                  'parent_frame': 'camera_link',
                                 #   'previewHeight': '640',
                                 #   'previewWidth': '640'
                                   }.items(),
         ),
 
-	Node(
+	    Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='oak_imu_tf_publisher',
-            arguments=['0', '0', '0.0', '0.7071', '0', '0', '0.7071', 'oak-d-base-frame', 'oak_imu_frame'] # Example: 5cm z offset
+            arguments=['0', '0', '0.0', '0.7071', '0', '0', '0.7071', 'camera_link', 'oak_imu_frame'] # Example: 5cm z offset
         ),
-
         # Sync right/depth/camera_info together
         Node(   
             package='rtabmap_sync', executable='rgbd_sync', output='screen',

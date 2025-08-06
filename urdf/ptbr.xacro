@@ -4,6 +4,9 @@
 <xacro:include filename="$(find ptbr)/urdf/materials.xacro" />
 <xacro:include filename="$(find ptbr)/urdf/ptbr.ros2control" />
 <xacro:include filename="$(find ptbr)/urdf/ptbr.gazebo" />
+
+<xacro:include filename="$(find ptbr)/urdf/camera.xacro" />
+
 <link name="base_link">
 </link>
 
@@ -117,28 +120,7 @@
   </collision>
 </link>
 
-<joint name="camera_joint" type="fixed">
-  <origin xyz="0.0 0.051235 0.174" rpy="0.0 0.0 0.0"/>
-  <parent link="head"/>
-  <child link="camera_link"/>
-  <axis xyz="0.0 0.0 0.0"/>
-</joint>
 
-<link name="camera_link">
-  <visual>
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-    <geometry>
-      <box size="0.09093 0.00247 0.027965"/>
-    </geometry>
-    <material name="red"/>
-  </visual>
-  <collision>
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-    <geometry>
-      <box size="0.09093 0.00247 0.027965"/>
-    </geometry>
-  </collision>
-</link>
 
 
 <joint name="right_wheel_joint" type="continuous">
@@ -146,6 +128,8 @@
   <parent link="base_link"/>
   <child link="right_wheel"/>
   <axis xyz="0 0.0 -1"/>
+  <limit effort="50000" velocity="10"/>
+  <dynamics damping="1.0" friction="1.0"/>
 </joint>
 
 <link name="right_wheel">
@@ -174,6 +158,8 @@
   <parent link="base_link"/>
   <child link="left_wheel"/>
   <axis xyz="0 0.0 1"/>
+  <limit effort="50000" velocity="10"/>
+  <dynamics damping="1.0" friction="1.0"/>
 </joint>
 
 <link name="left_wheel">
@@ -253,5 +239,7 @@
     </geometry>
   </collision>
 </link>
+
+
 
 </robot>

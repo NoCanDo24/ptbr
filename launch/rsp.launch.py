@@ -13,8 +13,8 @@ import xacro
 def generate_launch_description():
 
     # Check if we're told to use sim time
-    use_sim_time = LaunchConfiguration('use_sim_time')
-    use_ros2_control = LaunchConfiguration('use_ros2_control')
+    # use_sim_time = LaunchConfiguration('use_sim_time')
+    # use_ros2_control = LaunchConfiguration('use_ros2_control')
 
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('ptbr'))
@@ -27,7 +27,6 @@ def generate_launch_description():
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        name='robot_state_publisher',
         output='screen',
         parameters=[params]
     )
