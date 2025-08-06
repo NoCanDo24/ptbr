@@ -18,22 +18,22 @@ def generate_launch_description():
     pkg_ros_gz_rbot = get_package_share_directory('ptbr')
 
     # Parse robot description from xacro
-    robot_description_file = os.path.join(pkg_ros_gz_rbot, 'urdf', 'ptbr.xacro')
+    # robot_description_file = os.path.join(pkg_ros_gz_rbot, 'urdf', 'ptbr.xacro')
     ros_gz_bridge_config = os.path.join(pkg_ros_gz_rbot, 'config', 'ros_gz_bridge_gazebo.yaml')
     
-    robot_description_config = xacro.process_file(
-        robot_description_file
-    )
-    robot_description = {'robot_description': robot_description_config.toxml()}
+    # robot_description_config = xacro.process_file(
+    #     robot_description_file
+    # )
+    # robot_description = {'robot_description': robot_description_config.toxml()}
 
-    # Start Robot state publisher
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='both',
-        parameters=[robot_description],
-    )
+    # # Start Robot state publisher
+    # robot_state_publisher = Node(
+    #     package='robot_state_publisher',
+    #     executable='robot_state_publisher',
+    #     name='robot_state_publisher',
+    #     output='both',
+    #     parameters=[robot_description],
+    # )
 
     # Start Gazebo Sim
     gazebo = IncludeLaunchDescription(
@@ -76,6 +76,6 @@ def generate_launch_description():
             gazebo,
             spawn,
             start_gazebo_ros_bridge_cmd,
-            robot_state_publisher,
+            # robot_state_publisher,
         ]
     )
