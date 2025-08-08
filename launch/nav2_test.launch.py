@@ -14,7 +14,15 @@ def generate_launch_description():
         [nav2_bringup_dir, 'launch', 'navigation_launch.py'])
     
     # Path to your parameter file
-    params_file = os.path.join(pkg_share_dir, 'config', 'nav2_params.yaml')
+    nav2_params_file = os.path.join(pkg_share_dir, 'config', 'nav2_params.yaml')
+
+    nav2 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([nav2_launch]),
+        launch_arguments=[
+            ('use_sim_time', 'false'),
+            ('params_file', nav2_params_file)
+        ]
+    )
 
     return LaunchDescription([
         # Your robot description launch file
@@ -23,9 +31,9 @@ def generate_launch_description():
         # ),
         
         # RTAB-Map launch file
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'slam.launch.py')])
-        ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'slam.launch.py')])
+        # ),
 
         # Node(
         #     package='joint_state_publisher',
@@ -43,10 +51,5 @@ def generate_launch_description():
         # ),
         
         # Nav2 bringup
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch]),
-            # launch_arguments={
-            #     'params_file': params_file,
-            # }.items()
-        )
+        nav2,
     ])

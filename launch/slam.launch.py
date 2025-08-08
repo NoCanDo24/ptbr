@@ -17,8 +17,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 import xacro
 
 def generate_launch_description():
-    mode = LaunchConfiguration('slame_mode', default='mapping')
-    declare_mode = DeclareLaunchArgument('slam_mode', default_value=mode)
+    mode = LaunchConfiguration('mapping', default=True)
+    declare_mode = DeclareLaunchArgument('mapping', default_value=mode)
 
     startNewMap = None
     rtabmap_arg = None
@@ -83,7 +83,9 @@ def generate_launch_description():
     return LaunchDescription([
         declare_mode,
         
-
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('ptbr'), 'launch', 'rsp.launch.py'))
+        ),
 
         # Launch camera driver
         IncludeLaunchDescription(
