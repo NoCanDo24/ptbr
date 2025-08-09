@@ -24,32 +24,11 @@ def generate_launch_description():
         ]
     )
 
-    return LaunchDescription([
-        # Your robot description launch file
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource(os.path.join(pkg_share_dir, 'launch', 'rsp.launch.py'))
-        # ),
-        
-        # RTAB-Map launch file
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'slam.launch.py')])
-        # ),
+    poincloud_to_scan = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'pointcloud_to_laser.launch.py')])
+    )
 
-        # Node(
-        #     package='joint_state_publisher',
-        #     executable='joint_state_publisher',
-        #     name='joint_state_publisher',
-        #     output='screen'
-        # ),
-        
-        # Your custom motor controller node
-        # Node(
-        #     package='ptbr',
-        #     executable='motor_controller',
-        #     name='motor_controller',
-        #     output='screen'
-        # ),
-        
-        # Nav2 bringup
+    return LaunchDescription([
+        poincloud_to_scan,
         nav2,
     ])

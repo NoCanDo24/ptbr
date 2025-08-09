@@ -27,6 +27,8 @@ setup(
     entry_points={
         'console_scripts': [
             'motor_controller = ptbr.motor_controller_node:main',
+            'joint_controller = ptbr.joint_controller:main',
+            'joint_state_publisher = ptbr.joint_state_publisher:main'
         ],
     },
 )

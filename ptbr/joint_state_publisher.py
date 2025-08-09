@@ -18,6 +18,8 @@ class JointStatePublisher(Node):
             'joint_state/servos',
             self.save_servo_joint_state,
             10)
+
+        self.joint_pub = self.create_publisher(JointState, 'joint_states', 10)
         
         self.wheel_joint_states_sub  # prevent unused variable warning
         self.servo_joint_states_sub
@@ -25,7 +27,7 @@ class JointStatePublisher(Node):
         self.servo_joint_states = {'name': [], 'position': [], 'velocity': []}
         self.motor_joint_states = {'name': [], 'position': [], 'velocity': []}
 
-        self.timer = self.create_timer(0.05, self.publish_joint_states)
+        self.timer = self.create_timer(0.1, self.publish_joint_states)
 
     def save_motor_joint_state(self, msg: JointState):
         self.motor_joint_states['name'] = msg.name
@@ -38,23 +40,28 @@ class JointStatePublisher(Node):
         self.servo_joint_states['velocity'] = msg.velocity
     
     def publish_joint_states(self):
+
+        if len(self.motor_joint_states['name']) == 0 or len(self.servo_joint_states['name']) == 0:
+            return
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.name = self.motor_joint_states['name'] + self.servo_joint_states['name']
         msg.position = self.motor_joint_states['position'] + self.servo_joint_states['position']
         msg.velocity = self.motor_joint_states['velocity'] + self.servo_joint_states['velocity']
 
+        self.joint_pub.publish(msg)
+
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MinimalSubscriber()
+    joint_state_publisher = JointStatePublisher()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(joint_state_publisher)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    joint_state_publisher.destroy_node()
     rclpy.shutdown()
 
 

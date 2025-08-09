@@ -8,45 +8,17 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     pkg_share_dir = get_package_share_directory('ptbr')
-    nav2_bringup_dir = get_package_share_directory('nav2_bringup')
-
-    nav2_launch = PathJoinSubstitution(
-        [nav2_bringup_dir, 'launch', 'navigation_launch.py'])
-    
-    # Path to your parameter file
-    params_file = os.path.join(pkg_share_dir, 'config', 'nav2_params.yaml')
 
     return LaunchDescription([
-        # Your robot description launch file
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource(os.path.join(pkg_share_dir, 'launch', 'rsp.launch.py'))
-        # ),
-        
-        # RTAB-Map launch file
+        # Joint launch file (also launches motors)
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'joints.launch.py')])
+        ),
+
+        # Slam launch file
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(pkg_share_dir, 'launch', 'slam.launch.py')])
         ),
+        
 
-        # Node(
-        #     package='joint_state_publisher',
-        #     executable='joint_state_publisher',
-        #     name='joint_state_publisher',
-        #     output='screen'
-        # ),
-        
-        # Your custom motor controller node
-        # Node(
-        #     package='ptbr',
-        #     executable='motor_controller',
-        #     name='motor_controller',
-        #     output='screen'
-        # ),
-        
-        # Nav2 bringup
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch]),
-            # launch_arguments={
-            #     'params_file': params_file,
-            # }.items()
-        )
     ])

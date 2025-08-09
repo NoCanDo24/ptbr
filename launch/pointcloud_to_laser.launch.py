@@ -8,7 +8,7 @@ from launch_ros.actions import Node, ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
-
+    # extra pointcloud creator node, because the one from depthAI is too slow
     point_cloud_creator = ComposableNode(
         package='depth_image_proc',
         plugin='depth_image_proc::PointCloudXyziNode',
@@ -19,6 +19,7 @@ def generate_launch_description():
                     ('points', 'laser/points')]
     )
     return LaunchDescription([
+        # converter Node
         Node(
             package='pointcloud_to_laserscan',
             executable='pointcloud_to_laserscan_node',

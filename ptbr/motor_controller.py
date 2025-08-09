@@ -14,13 +14,14 @@ class MotorController:
         self.target_speed = 0
         self.m_speed = 0
         self.radius = 0.0325
+        self.last_time = time()
         self.KP = KP
 
         self.KD = KD
         self.prev_error = 0
 
         self.KI = KI
-        self.sum_error = 0
+        self.integral_error = 0
 
     def set_speed(self, target_speed):
         if self.target_speed != float(target_speed):
@@ -37,13 +38,23 @@ class MotorController:
         if self.target_speed == 0:
             self.update_speed(0)
             return 0
+        current_time = time()
+        dt = current_time - self.last_time
+        self.last_time = current_time
         speed = self.en.get_speed() * self.radius
         error = self.target_speed - speed
-        m_speed = self.m_speed + (error * self.KP) + (self.prev_error * self.KD) + (self.sum_error * self.KI)
+
+        p_control = error * self.KP
+
+        self.integral_error += error * dt
+        i_control = self.integral_error * self.KI
+
+        d_control = ((error - self.prev_error) / dt) * self.KD
         self.prev_error = error
-        self.sum_error += error
+
+
+        m_speed = self.m_speed + p_control + d_control + i_control
         self.error_buffer.appendleft(abs(error))
-        print(self.error_buffer)
         
         avg_error = sum(self.error_buffer)/len(self.error_buffer)
 
