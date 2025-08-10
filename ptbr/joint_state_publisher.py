@@ -27,7 +27,7 @@ class JointStatePublisher(Node):
         self.servo_joint_states = {'name': [], 'position': [], 'velocity': []}
         self.motor_joint_states = {'name': [], 'position': [], 'velocity': []}
 
-        self.timer = self.create_timer(0.1, self.publish_joint_states)
+        self.timer = self.create_timer(0.5, self.publish_joint_states)
 
     def save_motor_joint_state(self, msg: JointState):
         self.motor_joint_states['name'] = msg.name

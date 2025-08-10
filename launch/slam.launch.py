@@ -16,6 +16,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 import xacro
 
+import copy
+
 def generate_launch_description():
     mode = LaunchConfiguration('mapping', default=True)
     declare_mode = DeclareLaunchArgument('mapping', default_value=mode)
@@ -30,7 +32,7 @@ def generate_launch_description():
         rtabmap_arg = '--delete_db_on_start'
 
     parameters=[{
-         'frame_id':'base_link',
+         'frame_id':'base_footprint',
          'subscribe_rgbd':True,
         #  'subscribe_rgb': True,
         #  'subscribe_depth': True,
@@ -39,44 +41,39 @@ def generate_launch_description():
          'approx_sync_max_interval': 0.1,
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
-         'Odom/ResetCountdown': '0',
-         'Odom/Strategy': '0',
+         'Odom/ResetCountdown': '1',
+         'Rtabmap/StartNewMapOnLoopClosure': 'true',
+         'Odom/Strategy': '1',
 	     'Odom/ImageDecimation': '2',
          'Optimizer/GravitySigma': '0.3',
          'Vis/ForceIMUInitialization': 'true',
 
-
+         'Vis/CorType': '1',
          'Vis/FeatureType': '6',
-         'Vis/MaxFeatures': '1500',
+         'Vis/MaxFeatures': '500',
 	     'Vis/MinInliers': '12',
 	     'Vis/Pipeline': '6',
          'Mem/ReduceGraph': 'true',
+         'OdomF2M/MaxSize': '1000',
+         'GFTT/MinDistance': '10',
+         'cloud_noise_filtering_radius': '0.05',
+         'cloud_noise_filtering_min_neighbors': '2',
+         'proj_max_ground_angle': '45',
+         'proj_max_ground_height': '0.1',
+         'Reg/Force3DoF': 'true',
+         'Optimizer/Slam2D': 'true',
          
-         'Rtabmap/KeyFrameThr': '0.4',
-         
-         'QueueSize': 10,
-         'Rtabmap/PublishTF': 'true',
+         'publish_tf': False,
 
          'database_path': '~/.ros/rtabmap.db',
-         'rtabmap_args': rtabmap_arg,
-         'Rtabmap/StartNewMap': startNewMap,
-         'Rtabmap/Mem/Incremental': startNewMap,
+         'rtabmap_args': '--delete_db_on_start',
+         'Rtabmap/StartNewMap': 'true',
+         'Rtabmap/Mem/Incremental': 'true',
 
-         # NEW: Grid Map Generation Parameters for Nav2
-         'publish_map_tf': 'true', # Ensures map->odom transform is published
-         'map_manager/grid/footprint_padding': '0.1', # Padding around robot footprint for unknown areas
-         'map_manager/grid/from_projected_map': 'false', # True to use 2D projected map, false for 3D voxel grid
-         'map_manager/grid/voxel_size': '0.05', # Resolution of the grid map in meters (e.g., 5cm)
-         'map_manager/grid/min_occupied_size': '0.05', # Min size for a voxel to be considered occupied
-         'map_manager/grid/max_range': '4.0', # Max range for depth points to be considered in the map
-         'map_manager/grid/cloud_voxel_size': '0.05', # Voxel filter size for points before grid creation
-         'map_manager/grid/map_filter_nodes': 'true', # Filter out nodes not in active graph
-         'map_manager/grid/min_map_size': '1.0', # Minimum size of the map to publish
-         'map_manager/grid/map_updated': 'true', # Publish map updates
-         'Rtabmap/SavePointCloud': 'false',
-	     'Rtabmap/SaveImgRaw': 'false',
-	     'Rtabmap/SaveDepthRaw': 'false'
 	    }]
+    parameters_map = copy.deepcopy(parameters)
+    parameters_map[0]['publish_tf'] = True
+    print(parameters[0]['publish_tf'], parameters_map[0]['publish_tf'])
 
     remappings=[('imu', '/imu/data')]
 
@@ -92,10 +89,10 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('depthai_examples'), 'launch'),
                 '/stereo_inertial_node.launch.py']),
-                launch_arguments={'usb2Mode': 'true',
+                launch_arguments={
                                   'depth_aligned': 'true',
                                   'enableRviz': 'false',
-                                  'monoResolution': '480p',
+                                  'monoResolution': '400p',
 				                  'rgbResolution': '4K',
                                   'rgbScaleNumerator': '1',
                                   'rgbScaleDinominator': '5',
@@ -142,7 +139,7 @@ def generate_launch_description():
         # VSLAM
         Node(
             package='rtabmap_slam', executable='rtabmap', output='screen',
-            parameters=parameters,
+            parameters=parameters_map,
             remappings=remappings, # No IMU remapping here
             arguments=['-d']),
 

@@ -20,16 +20,19 @@ class Motor_controller(Node):
         super().__init__('motor_controller')
         self.cmd_vel_subscription = self.create_subscription(
             Twist,
-            'cmd_vel_nav',
+            'cmd_vel',
             self.cmd_vel_callback,
             10)
         self.cmd_vel_subscription  # prevent unused variable warning
 
         self.wheel_state_publisher = self.create_publisher(JointState, 'joint_state/motors', 10)
-        self.publish_timer = self.create_timer(0.1, self.publish_joints)
+        self.publish_timer = self.create_timer(0.5, self.publish_joints)
 
         self.odom_publisher = self.create_publisher(Odometry, '/odom', 10)
+        self.odom_pub_timer = self.create_timer(0.5, self.publish_odom)
         self.tf_broadcaster = TransformBroadcaster(self)
+        self.last_r = 0
+        self.last_l = 0
 
         self.x = 0.0
         self.y = 0.0
@@ -37,7 +40,7 @@ class Motor_controller(Node):
         self.last_time = time()
 
 
-        self.timer = self.create_timer(0.01, self.pid_loop)
+        self.timer = self.create_timer(0.05, self.pid_loop)
 
         self.r = MotorController(11, 9, 8, 5, 6, KP=0.05, KD=0.001, KI=0.00001)
         self.l = MotorController(10, 22, 25, 23, 24, KP=0.05, KD=0.002, KI=0.000005)
@@ -73,33 +76,47 @@ class Motor_controller(Node):
 
         self.wheel_state_publisher.publish(msg)
 
-        self.publish_odom(r_speed * self.radius, l_speed * self.radius)
-
     def get_pos_from_pulse(self, m: MotorController):
         current_rotation = m.en.pulse_count/m.en.ppr_total
         minus_full = current_rotation - math.floor(current_rotation)
         return minus_full * 2 * math.pi
 
-    def publish_odom(self, r_speed, l_speed):
+    def publish_odom(self):
+        current_pos_r = self.r.en.pulse_count
+        movement_r = current_pos_r - self.last_r
+        self.last_r = current_pos_r
+        movement_r = (movement_r/self.r.en.ppr_total) * math.pi * 2 * self.radius
+
+        current_pos_l = self.l.en.pulse_count
+        movement_l = current_pos_l - self.last_l
+        self.last_l = current_pos_l
+        movement_l = (movement_l/self.l.en.ppr_total) * math.pi * 2 * self.radius
+
         current_time = time()
-        dt = self.last_time - current_time
+        dt = current_time - self.last_time
         self.last_time = current_time
 
-        linear_x = (r_speed + l_speed) / 2
-        angular_z = (r_speed - l_speed) / self.wheel_seperation
+        r_speed = movement_r / dt
+        l_speed = movement_l / dt
 
-        delta_x = linear_x * math.sin(self.theta) * dt
-        delta_y = linear_x * math.cos(self.theta) * dt
+        linear_x = (r_speed + l_speed) / 2
+        angular_z = (r_speed - l_speed) / (self.wheel_seperation * 2)
+
+        delta_x = linear_x * math.cos(self.theta) * dt
+        delta_y = linear_x * math.sin(self.theta) * dt
         delta_theta = angular_z * dt
 
-        self.x += delta_x
+
+        self.x -= delta_x
         self.y += delta_y
         self.theta += delta_theta
+
+        print(movement_r, movement_l)
 
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = 'odom'
-        t.child_frame_id = 'base_link'
+        t.child_frame_id = 'base_footprint'
 
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
@@ -116,7 +133,7 @@ class Motor_controller(Node):
         odom = Odometry()
         odom.header.stamp = self.get_clock().now().to_msg()
         odom.header.frame_id = 'odom'
-        odom.child_frame_id = 'base_link'
+        odom.child_frame_id = 'base_footprint'
 
         # Set the pose
         odom.pose.pose.position.x = self.x
@@ -132,6 +149,8 @@ class Motor_controller(Node):
         odom.twist.twist.angular.z = angular_z
 
         self.odom_publisher.publish(odom)
+
+
 def main(args=None):
     rclpy.init(args=args)
 

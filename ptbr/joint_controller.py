@@ -19,7 +19,7 @@ class JointController(Node):
         super().__init__('motor_controller')
 
         self.servo_state_publisher = self.create_publisher(JointState, 'joint_state/servos', 10)
-        self.publish_timer = self.create_timer(0.1, self.publish_joints)
+        self.publish_timer = self.create_timer(0.5, self.publish_joints)
         self.head_servo = Servo(13)
         self.head_servo.updateAngle(40)
         sleep(2)

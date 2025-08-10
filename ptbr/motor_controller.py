@@ -25,7 +25,6 @@ class MotorController:
 
     def set_speed(self, target_speed):
         if self.target_speed != float(target_speed):
-            print(f"updating targetspeed! {target_speed}")
             self.target_speed = float(target_speed)
             self.speed.value = 0
             if target_speed != 0:
@@ -58,8 +57,8 @@ class MotorController:
         
         avg_error = sum(self.error_buffer)/len(self.error_buffer)
 
-        if avg_error > 0.05:
-            print(f"m_speed: {m_speed}, speed: {speed}, target speed: {self.target_speed}, error: {error}, avg_error: {avg_error}")
+        # if avg_error > 0.05:
+        #     print(f"m_speed: {m_speed}, speed: {speed}, target speed: {self.target_speed}, error: {error}, avg_error: {avg_error}")
         
         if self.target_speed >= 0:
             m_speed = max(min(1, m_speed), 0)
