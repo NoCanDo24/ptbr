@@ -36,13 +36,13 @@ def generate_launch_description():
          'subscribe_rgbd':True,
         #  'subscribe_rgb': True,
         #  'subscribe_depth': True,
-         'subscribe_odom_info':True,
+        #  'subscribe_odom_info':True,
          'approx_sync':True,
          'approx_sync_max_interval': 0.1,
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
-         'Odom/ResetCountdown': '1',
-         'Rtabmap/StartNewMapOnLoopClosure': 'true',
+         'Odom/ResetCountdown': '0',
+        #  'Rtabmap/StartNewMapOnLoopClosure': 'true',
          'Odom/Strategy': '1',
 	     'Odom/ImageDecimation': '2',
          'Optimizer/GravitySigma': '0.3',
@@ -130,11 +130,11 @@ def generate_launch_description():
             remappings=[('imu/data_raw', '/imu')]),
 
         # Visual odometry
-        Node(
-            package='rtabmap_odom', executable='rgbd_odometry', output='screen',
-            parameters=parameters,
-            remappings=remappings # No IMU remapping here
-            ),
+        # Node(
+        #     package='rtabmap_odom', executable='rgbd_odometry', output='screen',
+        #     parameters=parameters,
+        #     remappings=remappings # No IMU remapping here
+        #     ),
 
         # VSLAM
         Node(

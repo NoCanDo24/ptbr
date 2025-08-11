@@ -20,7 +20,7 @@ class Motor_controller(Node):
         super().__init__('motor_controller')
         self.cmd_vel_subscription = self.create_subscription(
             Twist,
-            'cmd_vel',
+            'cmd_vel_nav',
             self.cmd_vel_callback,
             10)
         self.cmd_vel_subscription  # prevent unused variable warning
@@ -107,7 +107,7 @@ class Motor_controller(Node):
         delta_theta = angular_z * dt
 
 
-        self.x -= delta_x
+        self.x += delta_x
         self.y += delta_y
         self.theta += delta_theta
 
@@ -122,7 +122,7 @@ class Motor_controller(Node):
         t.transform.translation.y = self.y
         t.transform.translation.z = 0.0
 
-        q = tf_transformations.quaternion_from_euler(0,0,self.theta)
+        q = tf_transformations.quaternion_from_euler(0,0, self.theta)
         t.transform.rotation.x = q[0]
         t.transform.rotation.y = q[1]
         t.transform.rotation.z = q[2]
