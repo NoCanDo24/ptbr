@@ -3,6 +3,10 @@ from rclpy.node import Node
 from tf2_ros import TransformBroadcaster
 import tf_transformations
 
+import rclpy.parameter
+
+from rclpy.parameter_event_handler import ParameterEventHandler
+
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist, TransformStamped
 from nav_msgs.msg import Odometry
@@ -18,18 +22,30 @@ class Motor_controller(Node):
 
     def __init__(self):
         super().__init__('motor_controller')
-        self.cmd_vel_subscription = self.create_subscription(
+
+        self.declare_parameter('manual_control', False)
+        self.manual_control = False
+
+        self.cmd_vel_nav_subscription = self.create_subscription(
             Twist,
             'cmd_vel_nav',
+            self.cmd_vel_nav_callback,
+            10)
+        self.cmd_vel_nav_subscription  # prevent unused variable warning
+
+        self.cmd_vel_subscription = self.create_subscription(
+            Twist,
+            'cmd_vel',
             self.cmd_vel_callback,
             10)
         self.cmd_vel_subscription  # prevent unused variable warning
 
+
         self.wheel_state_publisher = self.create_publisher(JointState, 'joint_state/motors', 10)
         self.publish_timer = self.create_timer(0.5, self.publish_joints)
 
-        self.odom_publisher = self.create_publisher(Odometry, '/odom', 10)
-        self.odom_pub_timer = self.create_timer(0.5, self.publish_odom)
+        # self.odom_publisher = self.create_publisher(Odometry, '/odom', 10)
+        self.odom_pub_timer = self.create_timer(0.1, self.publish_odom)
         self.tf_broadcaster = TransformBroadcaster(self)
         self.last_r = 0
         self.last_l = 0
@@ -47,8 +63,22 @@ class Motor_controller(Node):
         self.wheel_seperation = 0.12
         self.radius = 0.0325
 
-
     def cmd_vel_callback(self, msg: Twist):
+        self.manual_control = self.get_parameter('manual_control').get_parameter_value().bool_value
+        print(self.manual_control)
+
+
+        if self.manual_control:
+            self.set_speed(msg)
+
+    def cmd_vel_nav_callback(self, msg: Twist):
+        self.manual_control = self.get_parameter('manual_control').get_parameter_value().bool_value
+        print(self.manual_control)
+
+        if not self.manual_control:
+            self.set_speed(msg)
+
+    def set_speed(self, msg:Twist):
         self.des_lin_vel = msg.linear.x
         self.des_ang_vel = msg.angular.z
 
@@ -111,44 +141,43 @@ class Motor_controller(Node):
         self.y += delta_y
         self.theta += delta_theta
 
-        print(movement_r, movement_l)
 
-        t = TransformStamped()
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = 'odom'
-        t.child_frame_id = 'base_footprint'
+        # t = TransformStamped()
+        # t.header.stamp = self.get_clock().now().to_msg()
+        # t.header.frame_id = 'odom'
+        # t.child_frame_id = 'base_footprint'
 
-        t.transform.translation.x = self.x
-        t.transform.translation.y = self.y
-        t.transform.translation.z = 0.0
+        # t.transform.translation.x = self.x
+        # t.transform.translation.y = self.y
+        # t.transform.translation.z = 0.0
 
-        q = tf_transformations.quaternion_from_euler(0,0, self.theta)
-        t.transform.rotation.x = q[0]
-        t.transform.rotation.y = q[1]
-        t.transform.rotation.z = q[2]
-        t.transform.rotation.w = q[3]
+        # q = tf_transformations.quaternion_from_euler(0,0, self.theta)
+        # t.transform.rotation.x = q[0]
+        # t.transform.rotation.y = q[1]
+        # t.transform.rotation.z = q[2]
+        # t.transform.rotation.w = q[3]
 
-        self.tf_broadcaster.sendTransform(t)
+        # self.tf_broadcaster.sendTransform(t)
 
-        odom = Odometry()
-        odom.header.stamp = self.get_clock().now().to_msg()
-        odom.header.frame_id = 'odom'
-        odom.child_frame_id = 'base_footprint'
+        # odom = Odometry()
+        # odom.header.stamp = self.get_clock().now().to_msg()
+        # odom.header.frame_id = 'odom'
+        # odom.child_frame_id = 'base_footprint'
 
-        # Set the pose
-        odom.pose.pose.position.x = self.x
-        odom.pose.pose.position.y = self.y
-        odom.pose.pose.position.z = 0.0
-        odom.pose.pose.orientation.x = q[0]
-        odom.pose.pose.orientation.y = q[1]
-        odom.pose.pose.orientation.z = q[2]
-        odom.pose.pose.orientation.w = q[3]
+        # # Set the pose
+        # odom.pose.pose.position.x = self.x
+        # odom.pose.pose.position.y = self.y
+        # odom.pose.pose.position.z = 0.0
+        # odom.pose.pose.orientation.x = q[0]
+        # odom.pose.pose.orientation.y = q[1]
+        # odom.pose.pose.orientation.z = q[2]
+        # odom.pose.pose.orientation.w = q[3]
 
-        # Set the twist (velocity)
-        odom.twist.twist.linear.x = linear_x
-        odom.twist.twist.angular.z = angular_z
+        # # Set the twist (velocity)
+        # odom.twist.twist.linear.x = linear_x
+        # odom.twist.twist.angular.z = angular_z
 
-        self.odom_publisher.publish(odom)
+        # self.odom_publisher.publish(odom)
 
 
 def main(args=None):

@@ -23,36 +23,34 @@ class Servo:
         self.angle_range = angle_range
         
     
-    def updateAngle(self, angle, steps=0.001, delay=0.1):
+    def updateAngle(self, angle, steps=0.005, delay=0.1):
         ms = angle * (self.max - self.min)/self.angle_range + self.min
 
         target_pwm = self.msToValue(ms)
 
 
-        self.pwm.value = target_pwm
+        current_pwm = self.pwm.value
 
-        # pwm_g = current_pwm
-        # if(current_pwm < target_pwm):
+        pwm_g = current_pwm
+        if(current_pwm < target_pwm):
 
-        #     while pwm_g < target_pwm:
+            while pwm_g < target_pwm:
             
-        #         if pwm_g + steps > target_pwm:
-        #             pwm_g = target_pwm
-        #         else:
-        #             pwm_g += steps
-        #         self.pwm.value = pwm_g
-        #         sleep(delay)
-        #         print(current_pwm, pwm_g, target_pwm)
-        # else:
-        #     while pwm_g > target_pwm:
+                if pwm_g + steps > target_pwm:
+                    pwm_g = target_pwm
+                else:
+                    pwm_g += steps
+                self.pwm.value = pwm_g
+                sleep(delay)
+        else:
+            while pwm_g > target_pwm:
             
-        #         if pwm_g - steps < target_pwm:
-        #             pwm_g = target_pwm
-        #         else:
-        #             pwm_g -= steps
-        #         self.pwm.value = pwm_g
-        #         sleep(delay)
-        #         print(current_pwm, pwm_g, target_pwm)
+                if pwm_g - steps < target_pwm:
+                    pwm_g = target_pwm
+                else:
+                    pwm_g -= steps
+                self.pwm.value = pwm_g
+                sleep(delay)
 
         
     def msToValue(self, ms):

@@ -34,36 +34,46 @@ def generate_launch_description():
     parameters=[{
          'frame_id':'base_footprint',
          'subscribe_rgbd':True,
-        #  'subscribe_rgb': True,
-        #  'subscribe_depth': True,
-        #  'subscribe_odom_info':True,
+         'subscribe_odom_info':True,
          'approx_sync':True,
          'approx_sync_max_interval': 0.1,
          'wait_imu_to_init':True,
          'Reg/ForceOdometryUpdate': 'true',
-         'Odom/ResetCountdown': '0',
-        #  'Rtabmap/StartNewMapOnLoopClosure': 'true',
-         'Odom/Strategy': '1',
-	     'Odom/ImageDecimation': '2',
+         'Odom/ResetCooldown': '1',
+         'Rtabmap/StartNewMapOnLoopClosure': 'true',
+
          'Optimizer/GravitySigma': '0.3',
          'Vis/ForceIMUInitialization': 'true',
 
+         'Odom/Noise/Angular': "0.1",
+         'Odom/Noise/Linear': "0.05",
+         'Optimizer/Strategy': "1",
+
          'Vis/CorType': '1',
          'Vis/FeatureType': '6',
-         'Vis/MaxFeatures': '500',
+         'Vis/MaxFeatures': '1000',
 	     'Vis/MinInliers': '12',
 	     'Vis/Pipeline': '6',
          'Mem/ReduceGraph': 'true',
          'OdomF2M/MaxSize': '1000',
-         'GFTT/MinDistance': '10',
          'cloud_noise_filtering_radius': '0.05',
-         'cloud_noise_filtering_min_neighbors': '2',
+         'cloud_noise_filtering_min_neighbors': '10',
          'proj_max_ground_angle': '45',
          'proj_max_ground_height': '0.1',
          'Reg/Force3DoF': 'true',
          'Optimizer/Slam2D': 'true',
+
+         'RGBD/NeighborLinkRefining': 'true',
+         'RGBD/ProximityBySpace': 'false',
+         'RGBD/AngularUpdate': '0.01',
+         'RGBD/LinearUpdate': '0.1',
+         'RGBD/OptimizeFromGraphEnd': 'false',
+         'RGBD/OptimizeStrategy': '2',
+         'RGBD/OptimizeRobust': 'true',
+         'RGBD/OptimizeMaxError': '0',
+
          
-         'publish_tf': False,
+         'publish_tf': True,
 
          'database_path': '~/.ros/rtabmap.db',
          'rtabmap_args': '--delete_db_on_start',
@@ -71,10 +81,6 @@ def generate_launch_description():
          'Rtabmap/Mem/Incremental': 'true',
 
 	    }]
-    parameters_map = copy.deepcopy(parameters)
-    parameters_map[0]['publish_tf'] = True
-    print(parameters[0]['publish_tf'], parameters_map[0]['publish_tf'])
-
     remappings=[('imu', '/imu/data')]
 
     return LaunchDescription([
@@ -90,21 +96,18 @@ def generate_launch_description():
                 get_package_share_directory('depthai_examples'), 'launch'),
                 '/stereo_inertial_node.launch.py']),
                 launch_arguments={
-                                  'depth_aligned': 'true',
-                                  'enableRviz': 'false',
-                                  'monoResolution': '400p',
-				                  'rgbResolution': '4K',
-                                  'rgbScaleNumerator': '1',
-                                  'rgbScaleDinominator': '5',
-                                  'enable_imu': 'true', # Added: explicitly disable IMU in the camera driver
-                                  'camera_model': 'OAK-D-LITE',
-                                  'stereo_fps': '10',
-                                  'nnName': 'butter_person_v1_openvino_2022.1_3shave.blob',
-                                  'resourceBaseFolder': '/home/leosc/MaturaProject/PassTheButterRobot/result',
-                                  'detectionClassesCount': '2',
                                   'parent_frame': 'camera_link',
-                                #   'previewHeight': '640',
-                                #   'previewWidth': '640'
+                                  'depth_aligned': 'true', # Für die Befähigung des Modells
+                                  'enableRviz': 'false', # Keine visualisation
+                                  'monoResolution': '400p', # Auflösung der Stereo Kameras
+				                  'rgbResolution': '1080p', # Auflösung der Farbkamera
+                                  'rgbScaleNumerator': '1', # Zähler des Skalars der Auflösung der Farbkamera
+                                  'rgbScaleDinominator': '2', # Nenner des Skalars der Auflösung der Farbkamera
+                                  'camera_model': 'OAK-D-LITE', # Definition des Kameramodells
+                                  'stereo_fps': '5', # Aktualisierungsrate der Tiefenbilder
+                                  'nnName': 'butter_person_v1_openvino_2022.1_3shave.blob', # Name des Objekterkennungs Modell
+                                  'resourceBaseFolder': '/home/leosc/MaturaProject/PassTheButterRobot/result', # Lokaler Pfad zum Modell
+                                  'detectionClassesCount': '2', # Anzahl Klassen im Modell
                                   }.items(),
         ),
 
@@ -130,16 +133,16 @@ def generate_launch_description():
             remappings=[('imu/data_raw', '/imu')]),
 
         # Visual odometry
-        # Node(
-        #     package='rtabmap_odom', executable='rgbd_odometry', output='screen',
-        #     parameters=parameters,
-        #     remappings=remappings # No IMU remapping here
-        #     ),
+        Node(
+            package='rtabmap_odom', executable='rgbd_odometry', output='screen',
+            parameters=parameters,
+            remappings=remappings # No IMU remapping here
+            ),
 
         # VSLAM
         Node(
             package='rtabmap_slam', executable='rtabmap', output='screen',
-            parameters=parameters_map,
+            parameters=parameters,
             remappings=remappings, # No IMU remapping here
             arguments=['-d']),
 

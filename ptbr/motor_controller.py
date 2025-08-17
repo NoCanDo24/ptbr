@@ -36,7 +36,7 @@ class MotorController:
     def PID_control(self):
         if self.target_speed == 0:
             self.update_speed(0)
-            return 0
+            return
         current_time = time()
         dt = current_time - self.last_time
         self.last_time = current_time
@@ -65,8 +65,6 @@ class MotorController:
         else:
             m_speed = min(max(-1, m_speed), 0)
         self.update_speed(m_speed)
-
-        return avg_error
 
 
     def update_speed(self, speed_input):

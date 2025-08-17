@@ -9,15 +9,15 @@ from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     # extra pointcloud creator node, because the one from depthAI is too slow
-    point_cloud_creator = ComposableNode(
-        package='depth_image_proc',
-        plugin='depth_image_proc::PointCloudXyziNode',
-        name='point_cloud_xyzi',
-        remappings=[('depth/image_rect', 'stereo/converted_depth'),
-                    ('intensity/image_rect', 'color/image'),
-                    ('intensity/camera_info', 'color/camera_info'),
-                    ('points', 'laser/points')]
-    )
+    # point_cloud_creator = ComposableNode(
+    #     package='depth_image_proc',
+    #     plugin='depth_image_proc::PointCloudXyziNode',
+    #     name='',
+    #     remappings=[('depth/image_rect', 'stereo/converted_depth'),
+    #                 ('intensity/image_rect', 'color/image'),
+    #                 ('intensity/camera_info', 'color/camera_info'),
+    #                 ('points', 'laser/points')]
+    # )
     return LaunchDescription([
         # converter Node
         Node(
@@ -35,19 +35,19 @@ def generate_launch_description():
                 "use_sensor_data_qos": True
             }],
             remappings=[
-                ("cloud_in", "laser/points"),
+                ("cloud_in", "stereo/points"),
                 ("scan", "/scan")
             ],
         ),
 
-        ComposableNodeContainer(
-                name='container',
-                namespace='',
-                package='rclcpp_components',
-                executable='component_container',
-                composable_node_descriptions=[
-                    # Driver itself
-                    point_cloud_creator
-                ],
-                output='screen',)
+        # ComposableNodeContainer(
+        #         name='container',
+        #         namespace='',
+        #         package='rclcpp_components',
+        #         executable='component_container',
+        #         composable_node_descriptions=[
+        #             # Driver itself
+        #             point_cloud_creator
+        #         ],
+        #         output='screen',)
     ])
